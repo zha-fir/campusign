@@ -11,7 +11,6 @@ Route::get('/', function () {
 });
 
 
-// Halaman login
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'index'])
         ->name('login');
@@ -20,12 +19,10 @@ Route::middleware('guest')->group(function () {
         ->name('login.authenticate');
 });
 
-// Logout
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// Dashboard Admin
 Route::get('/admin/dashboard', function () {
     return view('admin.dashboard', ['role' => 'Admin']);
 })->middleware(['auth', 'role:admin'])->name('admin.dashboard');
@@ -80,3 +77,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/datamhs/{id}', [MahasiswaController::class, 'update'])->name('datamhs.update');
     Route::delete('/datamhs/{id}', [MahasiswaController::class, 'destroy'])->name('datamhs.destroy');
 });
+Route::get('/operator/dashboard', function () {
+    return view('operator.dashboard', ['role' => 'Operator']);
+})->middleware(['auth', 'role:operator'])->name('operator.dashboard');
+
+Route::get('/ketua-jurusan/dashboard', function () {
+    return view('ketua_jurusan.dashboard', ['role' => 'Ketua Jurusan']);
+})->middleware(['auth', 'role:ketuajurusan'])->name('ketua_jurusan.dashboard');
+
+Route::middleware(['auth', 'role:mahasiswa'])
+    ->prefix('mahasiswa')
+    ->name('mahasiswa.')
+    ->group(function () {
+        Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
+        Route::get('/katalog', [MahasiswaController::class, 'katalog'])->name('katalog');
+        Route::get('/profil', [MahasiswaController::class, 'profil'])->name('profil');
+        Route::post('/profil', [MahasiswaController::class, 'simpanProfil'])->name('profil.simpan');
+    });
