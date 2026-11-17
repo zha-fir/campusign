@@ -12,10 +12,21 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+        ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
+
+        // User yang sudah login dialihkan ke dashboard sesuai rolenya
+        $middleware->redirectUsersTo(function (Request $request) {
+            return match ($request->user()->role) {
+                'admin'        => route('admin.dashboard'),
+                'operator'     => route('operator.dashboard'),
+                'ketuajurusan' => route('ketua_jurusan.dashboard'),
+                'mahasiswa'    => route('mahasiswa.dashboard'),
+                default        => abort(403, 'Role akun tidak valid.'),
+            };
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
