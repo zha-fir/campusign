@@ -28,9 +28,24 @@ Route::get('/admin/dashboard', function () {
 })->middleware(['auth', 'role:admin'])->name('admin.dashboard');
 
 // Dashboard Operator
-Route::get('/operator/dashboard', function () {
-    return view('operator.dashboard', ['role' => 'Operator']);
-})->middleware(['auth', 'role:operator'])->name('operator.dashboard');
+Route::middleware(['auth', 'role:operator'])
+    ->prefix('operator')
+    ->name('operator.')
+    ->controller(\App\Http\Controllers\Operator\OperatorPageController::class)
+    ->group(function () {
+
+        Route::get('/dashboard', 'dashboard')
+            ->name('dashboard');
+
+        Route::get('/verifikasi-berkas', 'verifikasi')
+            ->name('verifikasi');
+
+        Route::get('/editor-surat', 'editor')
+            ->name('editor');
+
+        Route::get('/serah-terima', 'serahTerima')
+            ->name('serahTerima');
+    });
 
 // Dashboard Ketua Jurusan
 Route::get('/ketua-jurusan/dashboard', function () {
